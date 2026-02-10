@@ -1,6 +1,6 @@
 import { generateText } from "ai";
 import { inngest } from "./client";
-import { google } from "@ai-sdk/google";
+import { anthropic } from "@ai-sdk/anthropic";
 import { firecrawl } from "@/lib/firecrawl";
 
 const URL_REGEX = /https?:\/\/[^\s]+/g;
@@ -20,7 +20,7 @@ export const demoGenerate = inngest.createFunction(
         urls.map(async (url) => {
           const result = await firecrawl.scrape(url, { formats: ["markdown"] });
           return result.markdown ?? null;
-        })
+        }),
       );
       return results.filter(Boolean).join("\n\n");
     });
@@ -31,7 +31,7 @@ export const demoGenerate = inngest.createFunction(
 
     await step.run("generate-text", async () => {
       return await generateText({
-        model: google("gemini-2.5"),
+        model: anthropic("claude-3-haiku-20240307"),
         prompt: finalPrompt,
         experimental_telemetry: {
           isEnabled: true,
@@ -40,7 +40,7 @@ export const demoGenerate = inngest.createFunction(
         },
       });
     });
-  }
+  },
 );
 
 export const demoError = inngest.createFunction(
@@ -50,5 +50,5 @@ export const demoError = inngest.createFunction(
     await step.run("fail", async () => {
       throw new Error("Inngest error: Background job failed!");
     });
-  }
+  },
 );
